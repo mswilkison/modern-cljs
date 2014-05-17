@@ -18,7 +18,7 @@
            "Price can't be empty"
            (first (:price (validate-shopping-form "1" "" "0" "0")))
 
-           "Tax can't be emmpty"
+           "Tax can't be empty"
            (first (:tax (validate-shopping-form "1" "0" "" "0")))
 
            "Discount can't be empty"
@@ -33,10 +33,10 @@
            (first (:quantity (validate-shopping-form "1.1" "0" "0" "0")))
 
            "Price has to be a number"
-           (first (:quantity (validate-shopping-form "1" "foo" "0" "0")))
+           (first (:price (validate-shopping-form "1" "foo" "0" "0")))
 
            "Tax has to be a number"
-           (first (:tax (validate-shopping-form "1" "0" "0" "foo" "0")))
+           (first (:tax (validate-shopping-form "1" "0" "foo" "0")))
 
            "Discount has to be a number"
            (first (:discount (validate-shopping-form "1" "0" "0" "foo")))))
