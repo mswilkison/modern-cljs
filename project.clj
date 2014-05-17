@@ -12,14 +12,16 @@
                  [domina "1.0.3-SNAPSHOT"]
                  [hiccups "0.2.0"]
                  [org.clojars.magomimmo/shoreleave-remote-ring "0.3.1-SNAPSHOT"]
-                 [org.clojars.magomimmo/shoreleave-remote "0.3.1-SNAPSHOT"]]
+                 [org.clojars.magomimmo/shoreleave-remote "0.3.1-SNAPSHOT"]
+                 [com.cemerick/valip "0.3.2"]]
   
   ; lein-cljsbuild plugin to build a cljs project
   :plugins [[lein-cljsbuild "1.0.0"]
             [lein-ring "0.8.8"]]
 
   ; cljsbuild options configuation
-  :cljsbuild {:builds
+  :cljsbuild {:crossovers [valip.core valip.predicates modern-cljs.login.validators]
+              :builds
               {:dev
                {; cljs source code path
                 :source-paths ["src/brepl" "src/cljs"]

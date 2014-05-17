@@ -1,41 +1,48 @@
 (ns modern-cljs.login
-  (:require-macros [hiccups.core :refer [html]])
+  (:require-macros [hiccups.core :refer [html]]
+                   [shoreleave.remotes.macros :as shore-macros])
   (:require [domina :refer [by-id by-class value append! prepend! destroy! attr log]]
             [domina.events :refer [listen! prevent-default]]
-            [hiccups.runtime :as hiccupsrt]))
+            [hiccups.runtime :as hiccupsrt]
+            [modern-cljs.login.validators :refer [user-credential-errors]]
+            [shoreleave.remotes.http-rpc :refer [remote-callback]]))
+
+(defn validate-email-domain [email]
+  (remote-callback :email-domain-errors
+                   [email]
+                   #(if %
+                      (do
+                        (prepend! (by-id "loginForm")
+                                  (html [:div.help.email "The email domain doesn't exist."]))
+                        false)
+                      true)))
 
 (defn validate-email [email]
   (destroy! (by-class "email"))
-  (if (not (re-matches (re-pattern (attr email :pattern)) (value email)))
+  (if-let [errors (:email (user-credential-errors (value email) nil))]
     (do
-      (prepend! (by-id "loginForm") (html [:div.help.email "Wrong email"]))
+      (prepend! (by-id "loginForm") (html [:div.help.email (first errors)]))
       false)
-    true))
+    (validate-email-domain (value email))))
 
 (defn validate-password [password]
   (destroy! (by-class "password"))
-  (if (not (re-matches (re-pattern (attr password :pattern)) (value password)))
+  (if-let [errors (:password (user-credential-errors nil (value password)))]
     (do
-      (append! (by-id "loginForm") (html [:div.help.password "Wrong password"]))
+      (append! (by-id "loginForm") (html [:div.help.password (first errors)]))
       false)
     true))
 
 ; define the function to be attached to form submission event
-(defn validate-form [e]
-  ; get email and password element from their ids in the HTML form
-  (let [email (by-id "email")
-        password (by-id "password")
-        email-val (value email)
-        password-val (value password)]
-    (if (or (empty? email-val) (empty? password-val))
+(defn validate-form [evt email password]
+  (if-let [{e-errs :email p-errs :password} (user-credential-errors (value email) (value password))]
+    (if (or e-errs p-errs)
       (do
         (destroy! (by-class "help"))
-        (prevent-default e)
-        (append! (by-id "loginForm") (html [:div.help "Please complete the form"])))
-      (if (and (validate-email email)
-               (validate-password password))
-        true
-        (prevent-default e)))))
+        (prevent-default evt)
+        (append! (by-id "loginForm") (html [:div.help "Please complete the form."])))
+      (prevent-default evt))
+    true))
 
 ; define the function to attached validate-form to onsubmit event of
 ; the form
@@ -46,6 +53,6 @@
            (aget js/document "getElementById"))
     (let [email (by-id "email")
           password (by-id "password")]
-      (listen! (by-id "submit") :click (fn [e] (validate-form e)))
-      (listen! email :blur (fn [e] (validate-email email)))
-      (listen! password :blur (fn [e] (validate-password password))))))
+      (listen! (by-id "submit") :click (fn [evt] (validate-form evt)))
+      (listen! email :blur (fn [evt] (validate-email email)))
+      (listen! password :blur (fn [evt] (validate-password password))))))
