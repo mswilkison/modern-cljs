@@ -3,14 +3,13 @@
   (:require [domina :refer [append! by-id by-class value set-value! destroy!]]
             [domina.events :refer [listen! prevent-default]]
             [hiccups.runtime :as hicupsrt]
-            [shoreleave.remotes.http-rpc :refer [remote-callback]]
-            [cljs.reader :refer [read-string]]))
+            [shoreleave.remotes.http-rpc :refer [remote-callback]]))
 
 (defn calculate [evt]
-  (let [quantity (read-string (value (by-id "quantity")))
-        price (read-string (value (by-id "price")))
-        tax (read-string (value (by-id "tax")))
-        discount (read-string (value (by-id "discount")))]
+  (let [quantity (value (by-id "quantity"))
+        price (value (by-id "price"))
+        tax (value (by-id "tax"))
+        discount (value (by-id "discount"))]
     (remote-callback :calculate
                      [quantity price tax discount]
                      #(set-value! (by-id "total") (.toFixed % 2)))
