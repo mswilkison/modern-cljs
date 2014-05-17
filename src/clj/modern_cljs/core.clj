@@ -12,6 +12,8 @@
   ; to serve document root addresss
   (GET "/" [] "<p>Hello from compojure</p>")
   (POST "/login" [email password] (authenticate-user email password))
+  (POST "/shopping" [quantity price tax discount]
+        (str "You enter: "quantity " " tax " and " discount "."))
   ; to serve static pages saved in resources/public director
   (resources "/")
   ; if page not found

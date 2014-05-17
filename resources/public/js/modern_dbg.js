@@ -36614,27 +36614,28 @@ goog.provide("modern_cljs.shopping");
 goog.require("cljs.core");
 goog.require("shoreleave.remotes.http_rpc");
 goog.require("cljs.reader");
+goog.require("domina");
+goog.require("domina.events");
 goog.require("cljs.reader");
 goog.require("shoreleave.remotes.http_rpc");
 goog.require("hiccups.runtime");
 goog.require("hiccups.runtime");
 goog.require("domina.events");
-goog.require("domina.events");
 goog.require("domina");
-goog.require("domina");
-modern_cljs.shopping.calculate = function calculate() {
+modern_cljs.shopping.calculate = function calculate(evt) {
   var quantity = cljs.reader.read_string.call(null, domina.value.call(null, domina.by_id.call(null, "quantity")));
   var price = cljs.reader.read_string.call(null, domina.value.call(null, domina.by_id.call(null, "price")));
   var tax = cljs.reader.read_string.call(null, domina.value.call(null, domina.by_id.call(null, "tax")));
   var discount = cljs.reader.read_string.call(null, domina.value.call(null, domina.by_id.call(null, "discount")));
-  return shoreleave.remotes.http_rpc.remote_callback.call(null, new cljs.core.Keyword(null, "calculate", "calculate", 4025218776), new cljs.core.PersistentVector(null, 4, 5, cljs.core.PersistentVector.EMPTY_NODE, [quantity, price, tax, discount], null), function(p1__10501_SHARP_) {
-    return domina.set_value_BANG_.call(null, domina.by_id.call(null, "total"), p1__10501_SHARP_.toFixed(2))
-  })
+  shoreleave.remotes.http_rpc.remote_callback.call(null, new cljs.core.Keyword(null, "calculate", "calculate", 4025218776), new cljs.core.PersistentVector(null, 4, 5, cljs.core.PersistentVector.EMPTY_NODE, [quantity, price, tax, discount], null), function(p1__17178_SHARP_) {
+    return domina.set_value_BANG_.call(null, domina.by_id.call(null, "total"), p1__17178_SHARP_.toFixed(2))
+  });
+  return domina.events.prevent_default.call(null, evt)
 };
-modern_cljs.shopping.add_help = function add_help() {
+modern_cljs.shopping.add_help_BANG_ = function add_help_BANG_() {
   return domina.append_BANG_.call(null, domina.by_id.call(null, "shoppingForm"), [cljs.core.str('\x3cdiv class\x3d"help"\x3eClick to calculate\x3c/div\x3e')].join(""))
 };
-modern_cljs.shopping.remove_help = function remove_help() {
+modern_cljs.shopping.remove_help_BANG_ = function remove_help_BANG_() {
   return domina.destroy_BANG_.call(null, domina.by_class.call(null, "help"))
 };
 modern_cljs.shopping.init = function init() {
@@ -36646,9 +36647,11 @@ modern_cljs.shopping.init = function init() {
       return and__3273__auto__
     }
   }())) {
-    domina.events.listen_BANG_.call(null, domina.by_id.call(null, "calc"), new cljs.core.Keyword(null, "click", "click", 1108654330), modern_cljs.shopping.calculate);
-    domina.events.listen_BANG_.call(null, domina.by_id.call(null, "calc"), new cljs.core.Keyword(null, "mouseover", "mouseover", 1601081963), modern_cljs.shopping.add_help);
-    return domina.events.listen_BANG_.call(null, domina.by_id.call(null, "calc"), new cljs.core.Keyword(null, "mouseout", "mouseout", 894298107), modern_cljs.shopping.remove_help)
+    domina.events.listen_BANG_.call(null, domina.by_id.call(null, "calc"), new cljs.core.Keyword(null, "click", "click", 1108654330), function(evt) {
+      return modern_cljs.shopping.calculate.call(null, evt)
+    });
+    domina.events.listen_BANG_.call(null, domina.by_id.call(null, "calc"), new cljs.core.Keyword(null, "mouseover", "mouseover", 1601081963), modern_cljs.shopping.add_help_BANG_);
+    return domina.events.listen_BANG_.call(null, domina.by_id.call(null, "calc"), new cljs.core.Keyword(null, "mouseout", "mouseout", 894298107), modern_cljs.shopping.remove_help_BANG_)
   }else {
     return null
   }
