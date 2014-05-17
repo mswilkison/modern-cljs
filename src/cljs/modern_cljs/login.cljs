@@ -53,6 +53,6 @@
            (aget js/document "getElementById"))
     (let [email (by-id "email")
           password (by-id "password")]
-      (listen! (by-id "submit") :click (fn [evt] (validate-form evt)))
+      (listen! (by-id "submit") :click (fn [evt] (validate-form evt email password)))
       (listen! email :blur (fn [evt] (validate-email email)))
       (listen! password :blur (fn [evt] (validate-password password))))))

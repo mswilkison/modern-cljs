@@ -6,6 +6,7 @@
 
   ; clj and cljs source path code
   :source-paths ["src/clj" "src/cljs" "src/brepl"]
+  :test-paths ["test/clj"]
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [org.clojure/clojurescript "0.0-2069"]
                  [compojure "1.1.6"]
@@ -23,7 +24,9 @@
   :hooks [leiningen.cljsbuild]
 
   ; cljsbuild options configuation
-  :cljsbuild {:crossovers [valip.core valip.predicates modern-cljs.login.validators]
+  :cljsbuild {:crossovers [valip.core valip.predicates
+                           modern-cljs.login.validators
+                           modern-cljs.shopping.validators]
               :builds
               {:dev
                {; cljs source code path
