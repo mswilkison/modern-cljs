@@ -6,7 +6,7 @@
 
   ; clj and cljs source path code
   :source-paths ["src/clj" "src/cljs" "src/brepl"]
-  :test-paths ["test/clj" "test/cljs"]
+  :test-paths ["target/test/clj" "target/test/cljs"]
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [org.clojure/clojurescript "0.0-2069"]
                  [compojure "1.1.6"]
@@ -20,9 +20,19 @@
   ; lein-cljsbuild plugin to build a cljs project
   :plugins [[lein-cljsbuild "1.0.0"]
             [lein-ring "0.8.8"]
-            [com.cemerick/clojurescript.test "0.2.1"]]
+            [com.cemerick/clojurescript.test "0.2.1"]
+            [com.keminglabs/cljx "0.3.2"]]
 
   :hooks [leiningen.cljsbuild]
+
+  ; cljx task configuration
+  :cljx {:builds [{:source-paths ["test/cljx"]
+                   :output-path "target/test/clj"
+                   :rules :clj}
+
+                  {:source-paths ["test/cljx"]
+                   :output-path "target/test/cljs"
+                   :rules :cljs}]}
 
   ; cljsbuild options configuation
   :cljsbuild {:crossovers [valip.core valip.predicates
@@ -37,9 +47,9 @@
                               "phantomjs-advanced"
                               ["phantomjs" :runner "test/js/testable.js"]}
               :builds
-              {:ws-unit-tests
+              {:whitespace-unit-tests
                {; CLJS scource code and unit test paths
-                :source-paths ["src/brepl" "src/cljs" "test/cljs"]
+                :source-paths ["src/brepl" "src/cljs" "target/test/cljs"]
 
                 ; Google Closure Compilter options
                 :compiler {; the name of emitted JS script file for unit testing
@@ -52,7 +62,7 @@
 
                :simple-unit-tests
                {
-                :source-paths ["src/brepl" "src/cljs" "test/cljs"]
+                :source-paths ["src/brepl" "src/cljs" "target/test/cljs"]
 
                 :compiler {
                             :output-to "test/js/testable_pre.js"
@@ -60,7 +70,7 @@
                             :pretty-print false}}
 
                :advanced-unit-tests
-               {:source-paths ["src/cljs" "test/cljs"]
+               {:source-paths ["src/cljs" "target/test/cljs"]
                 :compiler {
                            :output-to "test/js/testable.js"
                            :optimizations :advanced
