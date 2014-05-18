@@ -6,7 +6,7 @@
 
   ; clj and cljs source path code
   :source-paths ["src/clj" "src/cljs" "src/brepl"]
-  :test-paths ["test/clj"]
+  :test-paths ["test/clj" "test/cljs"]
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [org.clojure/clojurescript "0.0-2069"]
                  [compojure "1.1.6"]
@@ -19,7 +19,8 @@
   
   ; lein-cljsbuild plugin to build a cljs project
   :plugins [[lein-cljsbuild "1.0.0"]
-            [lein-ring "0.8.8"]]
+            [lein-ring "0.8.8"]
+            [com.cemerick/clojurescript.test "0.2.1"]]
 
   :hooks [leiningen.cljsbuild]
 
@@ -27,8 +28,44 @@
   :cljsbuild {:crossovers [valip.core valip.predicates
                            modern-cljs.login.validators
                            modern-cljs.shopping.validators]
+              :test-commands {"phantomjs-whitespace"
+                              ["phantomjs" :runner "test/js/testable_dbg.js"]
+
+                              "phantomjs-simple"
+                              ["phantomjs" :runner "test/js/testable_pre.js"]
+
+                              "phantomjs-advanced"
+                              ["phantomjs" :runner "test/js/testable.js"]}
               :builds
-              {:dev
+              {:ws-unit-tests
+               {; CLJS scource code and unit test paths
+                :source-paths ["src/brepl" "src/cljs" "test/cljs"]
+
+                ; Google Closure Compilter options
+                :compiler {; the name of emitted JS script file for unit testing
+                           :output-to "test/js/testable_dbg.js"
+
+                           ; minimum optimization
+                           :optimizations :whitespace
+                           ;prettify
+                           :pretty-print true}}
+
+               :simple-unit-tests
+               {
+                :source-paths ["src/brepl" "src/cljs" "test/cljs"]
+
+                :compiler {
+                            :output-to "test/js/testable_pre.js"
+                            :optimizations :simple
+                            :pretty-print false}}
+
+               :advanced-unit-tests
+               {:source-paths ["src/cljs" "test/cljs"]
+                :compiler {
+                           :output-to "test/js/testable.js"
+                           :optimizations :advanced
+                           :pretty false}}
+               :dev
                {; cljs source code path
                 :source-paths ["src/brepl" "src/cljs"]
 
@@ -41,6 +78,18 @@
 
                            ; generated JS code prettyfication
                            :pretty-print true}}
+               :pre-prod
+               {; cljs source code path
+                :source-paths ["src/cljs"]
+
+                :compiler {; different output name
+                           :output-to "resources/public/js/modern_pre.js"
+
+                           ; simple optimization
+                           :optimizations :simple
+
+                           ;no prettyfication
+                           :pretty-print false}}  
                :prod
                {; cljs source code path
                 :source-paths ["src/brepl" "src/cljs"]
@@ -53,17 +102,6 @@
 
                            ; no prettyfication
                            :pretty-print false}}
-               :pre-prod
-               {; cljs source code path
-                :source-paths ["src/cljs"]
-
-                :compiler {; different output name
-                           :output-to "resources/public/js/modern_pre.js"
-
-                           ; simple optimization
-                           :optimizations :simple
-
-                           ;no prettyfication
-                           :pretty-print false}}}}
+               }}
   
   :ring {:handler modern-cljs.core/app})
